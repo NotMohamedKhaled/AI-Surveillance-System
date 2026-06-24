@@ -68,7 +68,7 @@ npm run dev
 ### 2. Set Up AI Models
 The AI models are too large to be uploaded directly to GitHub and are ignored by git. 
 
-First, download the custom-trained models from this **[Google Drive Link][(YOUR_GOOGLE_DRIVE_LINK_HERE](https://drive.google.com/drive/folders/1fo0ATvjY9JSVyVTQCA4j71-xt5lvGWcl?usp=sharing)**, then place them in their respective locations inside the `Ai/` folder:
+First, download the custom-trained models from this **[Google Drive Link](https://drive.google.com/drive/folders/1fo0ATvjY9JSVyVTQCA4j71-xt5lvGWcl?usp=sharing)**, then place them in their respective locations inside the `Ai/` folder:
 
 1. **Person Pose Model (`yolov8n-pose.onnx`)**
    - Place it directly in the root of the `Ai/` folder:
