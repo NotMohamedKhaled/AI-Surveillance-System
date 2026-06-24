@@ -1489,7 +1489,6 @@ async function viewAlertDetail(id) {
       <div class="col-lg-7">
         <div class="detection-frame mb-3">
           <div class="detection-frame-bg d-flex align-items-center justify-content-center">
-            <div class="detection-overlay"><span class="detection-overlay-label">${String(a.typeLabel || '').toUpperCase()}</span></div>
             ${frame}
           </div>
         </div>

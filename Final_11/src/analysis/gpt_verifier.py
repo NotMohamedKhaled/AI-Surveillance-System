@@ -49,7 +49,8 @@ def verify_with_gpt(frame, situation: str) -> tuple[bool, str, str]:
     client = _get_client()
     if client is None:
         logger.warning("GPT verification skipped — no API key configured")
-        return False, "GPT unavailable — no API key", "UNAVAILABLE"
+        # Trust YOLO detections when GPT is unavailable (alerts still fire)
+        return True, "GPT unavailable — trusting YOLO detection", "UNAVAILABLE"
 
     try:
         _, buffer = cv2.imencode('.jpg', frame)

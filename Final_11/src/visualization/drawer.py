@@ -220,12 +220,18 @@ class Drawer:
                 label = "Normal"
             elif role.startswith("Armed"):
                 color = self.COLORS.get(role, (0, 0, 255))
-                wname = info.get('weapon_name', '?')
+                wname = info.get('weapon_name', 'Unknown')
                 wconf = info.get('weapon_conf', 0) or 0
-                label = f"{role}: {wname} {wconf*100:.1f}%"
+                label = f"{role} [{wname.capitalize()} {wconf*100:.0f}%]"
             elif contact_type in ("harassment", "assault", "push", "grabbing"):
                 color = self.COLORS.get(contact_type, (0, 255, 0))
-                label = f"{role} ({contact_type})"
+                # Check if there is a weapon involved anyway (sometimes role drops "Armed" if contact is strong)
+                if info.get('weapon_name'):
+                    wname = info.get('weapon_name')
+                    wconf = info.get('weapon_conf', 0) or 0
+                    label = f"{role} ({contact_type}) [{wname.capitalize()} {wconf*100:.0f}%]"
+                else:
+                    label = f"{role} ({contact_type})"
             elif contact_type == "normal_contact" or role == "Normal Contact":
                 color = self.COLORS.get("Normal Contact", (0, 255, 0))
                 label = "Normal Contact"

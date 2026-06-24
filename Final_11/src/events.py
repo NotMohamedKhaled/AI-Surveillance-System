@@ -72,6 +72,9 @@ class EventLogger:
 
     # Cooldown per entity (seconds) to avoid flooding
     COOLDOWN_SECONDS = 10
+    
+    # Global cooldown per camera (seconds) to prevent spamming the backend
+    CAMERA_COOLDOWN_SECONDS = 10
 
     def __init__(self, camera_ai_id=None, output_dir=None):
         self.camera_ai_id = camera_ai_id
@@ -79,6 +82,7 @@ class EventLogger:
         self._last_logged = {}  # {eid: timestamp}
         self._gathering = {}  # {eid: {"start_time": time, "max_sev": sev, "max_conf": conf, "best_frame": frame, "best_info": info}}
         self._event_count = 0
+        self._last_camera_alert = 0  # Timestamp of the last alert sent for this camera
         os.makedirs(self.output_dir, exist_ok=True)
 
     def _get_severity(self, info):
@@ -115,11 +119,24 @@ class EventLogger:
             else:
                 info["role"] = "Aggressor"
 
+        # --- If severity dropped below threshold, cancel any active gathering ---
         if severity < self.SAVE_THRESHOLD:
+            if eid in self._gathering:
+                logger.info("✓ Threat cleared (eid %d) — cancelling alert gather.", eid)
+                del self._gathering[eid]
             return
 
-        # Cooldown check
+        # Cooldown checks
         now = time.time()
+        
+        # 1. Camera-level cooldown
+        if now - self._last_camera_alert < self.CAMERA_COOLDOWN_SECONDS:
+            # If we are currently gathering for this entity, cancel it because the camera is on cooldown
+            if eid in self._gathering:
+                del self._gathering[eid]
+            return
+            
+        # 2. Entity-level cooldown
         last = self._last_logged.get(eid, 0)
         if now - last < self.COOLDOWN_SECONDS:
             return
@@ -145,14 +162,26 @@ class EventLogger:
                 state["best_info"] = dict(info)
                 logger.info(f"📈 Threat (eid {eid}) conf increased to: {conf:.2f}")
 
+    def cancel_gathering(self, eid):
+        """Cancel any active gathering for an entity (e.g. when it leaves the frame)."""
+        if eid in self._gathering:
+            logger.info("✓ Entity %d left frame — cancelling alert gather.", eid)
+            del self._gathering[eid]
+
     def flush_gathering(self):
         """Check all gathering states and log/alert if 2 seconds have passed."""
         now = time.time()
         for eid in list(self._gathering.keys()):
             state = self._gathering[eid]
             if now - state["start_time"] >= 2.0:
-                self._do_log_and_alert(eid, state["max_sev"], state["best_info"], state["best_frame"])
-                self._last_logged[eid] = now
+                # Final validation: only send if severity is still high enough
+                final_sev = state["max_sev"]
+                if final_sev >= self.SAVE_THRESHOLD:
+                    self._do_log_and_alert(eid, final_sev, state["best_info"], state["best_frame"])
+                    self._last_logged[eid] = now
+                    self._last_camera_alert = now
+                else:
+                    logger.info("✓ Gathering for eid %d expired but severity dropped — skipping.", eid)
                 del self._gathering[eid]
 
     def _do_log_and_alert(self, eid, severity, info, frame):

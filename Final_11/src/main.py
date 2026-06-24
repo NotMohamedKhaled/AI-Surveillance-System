@@ -269,15 +269,19 @@ def run_pipeline(frame, cam: CameraStream, person_detector, pose_estimator, weap
                 info["contact_pts"] = contacts
                 info["persist_cnt"] = MAX_PERSIST
             else:
+                # --- FAST DECAY: drop by 2 to clear stale labels quickly ---
                 if info["persist_cnt"] > 0:
-                    info["persist_cnt"] -= 1
-                else:
+                    info["persist_cnt"] = max(0, info["persist_cnt"] - 2)
+                if info["persist_cnt"] == 0:
                     info["role"] = "None"
                     info["contact_pts"] = []
                     info["contact_type"] = "None"
                     info["weapon_name"] = None
                     info["weapon_conf"] = None
                     info["weapon_bbox"] = None
+                    info["gpt_confirmed"] = None
+                    info["gpt_text"] = ""
+                    info["gpt_classification"] = ""
         else:
             info["role"] = "Normal Contact" if touching else "None"
             info["contact_type"] = "normal_contact" if touching else "None"
@@ -317,6 +321,25 @@ def run_pipeline(frame, cam: CameraStream, person_detector, pose_estimator, weap
 
         cam.event_logger.evaluate_and_log(eid, info, frame)
 
+    # --- Immediately reset entities that LEFT the frame ---
+    for eid in list(cam.tracker.entities.keys()):
+        if eid not in cur_ids:
+            info = cam.tracker.entities[eid]
+            # Entity is missing — force-clear all threat data immediately
+            info["role"] = "None"
+            info["contact_pts"] = []
+            info["contact_type"] = "None"
+            info["weapon_name"] = None
+            info["weapon_conf"] = None
+            info["weapon_bbox"] = None
+            info["persist_cnt"] = 0
+            info["gpt_confirmed"] = None
+            info["gpt_text"] = ""
+            info["gpt_classification"] = ""
+            # Cancel any pending alert for this entity
+            cam.event_logger.cancel_gathering(eid)
+
+    # --- Purge smoothers & cooldowns for fully deleted entities ---
     for eid in list(cam.entity_smoothers.keys()):
         if eid not in cam.tracker.entities:
             del cam.entity_smoothers[eid]
@@ -397,53 +420,70 @@ def create_grid(frames, max_width=DISPLAY_WIDTH, max_height=DISPLAY_HEIGHT):
 # -------------------------------------------------
 #  MAIN LOOP
 # -------------------------------------------------
-def run():
+def run(mode="production", local_sources=None):
+    """Start the surveillance system.
+
+    Args:
+        mode: 'production' to fetch cameras from backend API,
+              'local' to use local sources (webcam/video files).
+        local_sources: List of sources for local mode (e.g. [0, 'video.mp4']).
+    """
     if not _run_diagnostics():
         logger.error("Critical components missing — aborting.")
         return
 
     person_detector, pose_estimator, weapon_detector, drawer, executor = _init_system()
 
-    # ------------------------------------------------------------------
-    #  Camera Discovery (3-tier fallback)
-    #    1. Backend API  →  2. Command-line args  →  3. Webcam
-    # ------------------------------------------------------------------
     cameras = []
+    fallback_ai_id = CAMERA_AI_ID or None
 
-    logger.info("Fetching available cameras from backend API...")
-    api_cameras = fetch_cameras_for_ai()
+    if mode == "local":
+        # ------------------------------------------------------------------
+        #  LOCAL MODE: use webcam / video files, send alerts via CAMERA_AI_ID
+        # ------------------------------------------------------------------
+        sources = local_sources or [0]
+        logger.info("=" * 50)
+        logger.info("  MODE: LOCAL (webcam / video files)")
+        logger.info("=" * 50)
 
-    if api_cameras:
-        logger.info("Backend returned %d enabled camera(s).", len(api_cameras))
-        for i, c_data in enumerate(api_cameras):
-            rtsp = c_data.get("rtspUrl")
-            ai_id = c_data.get("cameraAiId")
-            name = c_data.get("name", f"Camera {i+1}")
-            if rtsp and ai_id:
-                logger.info("  ✓ Adding camera: %s (%s)", name, ai_id)
-                cameras.append(CameraStream(rtsp, ai_id, name))
-            else:
-                logger.warning("  ✗ Skipping camera (missing rtspUrl or cameraAiId): %s", c_data)
+        for idx, src in enumerate(sources):
+            name = "Webcam" if src == 0 else f"Local_{idx+1}"
+            logger.info("  ✓ Adding source: %s → %s", name, src)
+            cameras.append(CameraStream(src, fallback_ai_id, name))
 
-    if not cameras:
-        # Backend returned nothing useful — check CLI args
-        test_sources = sys.argv[1:]
-        if test_sources:
-            logger.info("No cameras from API. Using %d command-line source(s).", len(test_sources))
-            # Use legacy CAMERA_AI_ID from .env for alerts (if set)
-            fallback_ai_id = CAMERA_AI_ID or None
-            for idx, src in enumerate(test_sources):
-                src_val = int(src) if src.isdigit() else src
-                cameras.append(CameraStream(src_val, fallback_ai_id, f"Local_{idx+1}"))
+        if fallback_ai_id:
+            logger.info("  Alerts will be sent using CAMERA_AI_ID=%s", fallback_ai_id)
         else:
-            # Last resort — open default webcam
-            fallback_ai_id = CAMERA_AI_ID or None
-            logger.info("No cameras from API and no CLI args. Falling back to webcam (0).")
-            if fallback_ai_id:
-                logger.info("  Using CAMERA_AI_ID=%s from .env for alerts.", fallback_ai_id)
-            else:
-                logger.warning("  ⚠ No CAMERA_AI_ID in .env — alerts will NOT be sent to backend.")
-            cameras.append(CameraStream(0, fallback_ai_id, "Webcam"))
+            logger.warning("  ⚠ No CAMERA_AI_ID in .env — alerts will NOT be sent to backend.")
+
+    else:
+        # ------------------------------------------------------------------
+        #  PRODUCTION MODE: fetch cameras from backend API
+        # ------------------------------------------------------------------
+        logger.info("=" * 50)
+        logger.info("  MODE: PRODUCTION (backend API)")
+        logger.info("=" * 50)
+
+        logger.info("Fetching available cameras from backend API...")
+        api_cameras = fetch_cameras_for_ai()
+
+        if api_cameras:
+            logger.info("Backend returned %d enabled camera(s).", len(api_cameras))
+            for i, c_data in enumerate(api_cameras):
+                rtsp = c_data.get("rtspUrl")
+                ai_id = c_data.get("cameraAiId")
+                name = c_data.get("name", f"Camera {i+1}")
+                if rtsp and ai_id:
+                    logger.info("  ✓ Adding camera: %s (%s)", name, ai_id)
+                    cameras.append(CameraStream(rtsp, ai_id, name))
+                else:
+                    logger.warning("  ✗ Skipping camera (missing rtspUrl or cameraAiId): %s", c_data)
+        else:
+            logger.error("Backend returned no cameras. Make sure:")
+            logger.error("  1. The backend is running at %s",
+                         __import__("os").environ.get("BACKEND_URL", "(not set)"))
+            logger.error("  2. Cameras exist in the database with isEnabled=true")
+            logger.error("  Tip: Use 'python run.py --local' for testing without the backend.")
 
     if not cameras:
         logger.error("No valid cameras initialized. Exiting.")
