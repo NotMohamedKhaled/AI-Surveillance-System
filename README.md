@@ -138,7 +138,7 @@ python run.py --local 0 my_test_video.mp4
 
 By default, the YOLO models analyze bounding boxes and poses. Sometimes, two people hugging closely or shaking hands might look like an "Aggressor" to the raw math. 
 
-If you provide an `OPENAI_API_KEY` in the `.env` file:
+If you provide an `OPENAI_API_KEY` in the `.env` file:-
 1. When YOLO suspects a threat, it pauses for a fraction of a second.
 2. It sends the best frame to **GPT-4o Vision**.
 3. GPT acts as a human security guard. It looks at the context: *"Are they smiling? Is it a friendly hug? Or is it unwanted contact?"*
