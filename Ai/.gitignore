@@ -6,7 +6,8 @@
 .env
 .env.*
 *.key
-
+Final_11/
+Harassment_Detection_Pipeline.ipynb
 # ---------- Python ----------
 __pycache__/
 *.py[cod]

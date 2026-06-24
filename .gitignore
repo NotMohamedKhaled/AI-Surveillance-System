@@ -42,6 +42,9 @@ dataset/
 data/
 *.csv
 
+
+
+
 # Logs & Output
 logs/
 *.log
@@ -54,6 +57,8 @@ node_modules/
 npm-debug.log
 yarn-error.log
 yarn-debug.log
+
+AI/Harassment_Detection_Pipeline.ipynb/
 
 # Build output
 web/Front/dist/
