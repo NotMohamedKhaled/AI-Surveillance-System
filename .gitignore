@@ -5,7 +5,6 @@
 # ---------- Security ----------
 .env
 .env.*
-!.env.example
 *.key
 credentials.json
 secrets.json

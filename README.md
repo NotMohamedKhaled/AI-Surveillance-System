@@ -15,7 +15,20 @@ The project consists of two main folders:
 ## 🚀 How to Run
 
 ### 1. Start the Backend Server
-First, start the backend so the AI has a place to fetch cameras and send alerts.
+First, configure the backend environment. In the `web/Back/` folder, create a `.env` file based on `.env.example`:
+
+```env
+# Example .env file for web/Back/
+PORT=3000
+MONGO_URI=mongodb://localhost:27017/surveillance
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=1d
+SUPER_ADMIN_EMAIL=superadmin@example.com
+SUPER_ADMIN_PASSWORD=superadmin123
+AI_API_KEY=supersecretkey123
+```
+
+Then start the backend:
 
 ```bash
 cd web/Back
