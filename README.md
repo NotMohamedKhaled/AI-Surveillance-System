@@ -19,13 +19,41 @@ First, configure the backend environment. In the `web/Back/` folder, create a `.
 
 ```env
 # Example .env file for web/Back/
+# The port the Node.js server will listen on
 PORT=3000
-MONGO_URI=mongodb://localhost:27017/surveillance
+
+# --- Database Configuration ---
+# MongoDB Connection URI (Local or Atlas)
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/YourDatabaseName?retryWrites=true&w=majority
+
+# --- Security & Authentication ---
+# Secret key used to sign JSON Web Tokens (JWT) for dashboard login
 JWT_SECRET=your_super_secret_jwt_key_here
+# How long the JWT remains valid
 JWT_EXPIRES_IN=1d
+
+# --- Super Admin Credentials ---
+# The default admin account created when the server starts
 SUPER_ADMIN_EMAIL=superadmin@example.com
 SUPER_ADMIN_PASSWORD=superadmin123
+# Set to 'true' to force reset the superadmin password on startup
+FORCE_RESET_SUPER_ADMIN_PASSWORD=false
+
+# --- AI Integration ---
+# The secret key the AI system must provide to send alerts to this backend
+# (Must match the AI_API_KEY in the AI folder's .env)
 AI_API_KEY=supersecretkey123
+
+# --- Camera Monitoring ---
+# How long (in ms) before a camera is considered "Offline" if no heartbeat is received
+CAMERA_HEARTBEAT_TIMEOUT_MS=30000
+# How often (in ms) the backend checks for offline cameras
+CAMERA_HEARTBEAT_WATCHER_INTERVAL_MS=10000
+
+# --- Rate Limiting ---
+# Maximum number of requests allowed per IP window
+RATE_LIMIT_MAX=500
+
 ```
 
 Then start the backend:
