@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Sentinel AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+<div class="auth-page" id="loginPage">
+  <!-- Language Switcher -->
+  <div style="position: absolute; top: 20px; right: 24px; z-index: 100;">
+    <select class="form-select form-select-sm" id="loginLangSelect" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; width: auto; cursor: pointer;">
+      <option value="en" style="background: #0f172a; color: #fff;">English (EN)</option>
+      <option value="ar" style="background: #0f172a; color: #fff;">العربية (AR)</option>
+    </select>
+  </div>
+  <div class="auth-grid"></div>
+
+  <!-- Floating decorative elements -->
+  <div class="floating-cam" style="top:12%;left:8%;animation-delay:0s"><i class="fas fa-video me-2"></i>CAM-01 // ONLINE</div>
+  <div class="floating-cam" style="top:20%;right:10%;animation-delay:1.5s"><i class="fas fa-shield-halved me-2"></i>AI ENGINE ACTIVE</div>
+  <div class="floating-cam" style="bottom:18%;left:6%;animation-delay:3s"><i class="fas fa-eye me-2"></i>MONITORING 8 FEEDS</div>
+  <div class="floating-cam" style="bottom:25%;right:8%;animation-delay:2s"><i class="fas fa-bell me-2"></i>3 ACTIVE ALERTS</div>
+
+  <div class="auth-card" style="animation: slideUp 0.5s ease">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><i class="fas fa-shield-halved"></i></div>
+      <div class="auth-logo-text">
+        <div class="brand-name">SENTINEL AI</div>
+        <div class="brand-sub">Surveillance System</div>
+      </div>
+    </div>
+ 
+    <h2 class="auth-title" data-i18n="loginTitle">Welcome Back</h2>
+    <p class="auth-subtitle" data-i18n="loginSubtitle">Sign in to access the surveillance dashboard</p>
+
+    <form id="loginForm" novalidate>
+      <div class="mb-3">
+        <label class="auth-label" data-i18n="emailAddress">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text" style="background:rgba(255,255,255,0.04)!important;border-color:rgba(255,255,255,0.08)!important;color:rgba(255,255,255,0.25)!important">
+            <i class="fas fa-envelope"></i>
+          </span>
+          <input type="email" class="form-control auth-input" id="loginEmail" data-i18n="emailPlaceholder"
+            placeholder="admin@sentinel.ai" style="border-left:none!important;border-radius:0 10px 10px 0!important" required>
+        </div>
+        <div class="invalid-feedback" id="emailErr" style="color:#ff3b5c;font-size:0.72rem;margin-top:4px"></div>
+      </div>
+
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="auth-label mb-0" data-i18n="password">Password</label>
+          <!-- <a href="#" style="font-size:0.72rem;color:rgba(0,212,255,0.7)">Forgot password?</a> -->
+        </div>
+        <div class="input-group">
+          <span class="input-group-text" style="background:rgba(255,255,255,0.04)!important;border-color:rgba(255,255,255,0.08)!important;color:rgba(255,255,255,0.25)!important">
+            <i class="fas fa-lock"></i>
+          </span>
+          <input type="password" class="form-control auth-input" id="loginPass" data-i18n="passwordPlaceholder"
+            placeholder="Your password" style="border-left:none!important;border-right:none!important;border-radius:0!important" required>
+          <span class="input-group-text" id="togglePass" style="cursor:pointer;background:rgba(255,255,255,0.04)!important;border-color:rgba(255,255,255,0.08)!important;color:rgba(255,255,255,0.25)!important;border-radius:0 10px 10px 0!important">
+            <i class="fas fa-eye" id="passEye"></i>
+          </span>
+        </div>
+        <div class="invalid-feedback" id="passErr" style="color:#ff3b5c;font-size:0.72rem;margin-top:4px"></div>
+      </div>
+
+      <div class="d-flex align-items-center mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="rememberMe" style="accent-color:#00d4ff">
+          <label class="form-check-label" for="rememberMe" style="font-size:0.78rem;color:rgba(255,255,255,0.4)" data-i18n="rememberMe">Remember me</label>
+        </div>
+      </div>
+
+      <button type="button" class="btn-auth" id="loginBtn" onclick="doLogin()">
+        <span id="loginBtnText"><i class="fas fa-sign-in-alt me-2"></i><span data-i18n="signIn">Sign In</span></span>
+        <span id="loginBtnLoader" style="display:none"><div class="loader-ring" style="width:20px;height:20px;border-width:2px;display:inline-block;vertical-align:middle"></div></span>
+      </button>
+    </form>
+
+    <!-- Demo hint -->
+    <!-- <div style="margin-top:20px;padding:12px 16px;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px">
+      <div style="font-size:0.68rem;color:rgba(0,212,255,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px">Super admin sign-in</div>
+      <div style="font-size:0.75rem;color:rgba(255,255,255,0.35)">
+        Use <code style="color:rgba(255,255,255,0.5)">SUPER_ADMIN_EMAIL</code> and <code style="color:rgba(255,255,255,0.5)">SUPER_ADMIN_PASSWORD</code> from the backend <code style="color:rgba(255,255,255,0.5)">.env</code> (password must be at least 6 characters). When the server starts, the console logs the super admin email if one already exists.
+      </div>
+    </div> -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/shared.js" defer></script>
+<script src="js/login.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# ============================================================
+#  Smart Forensic Security System — Python Dependencies
+# ============================================================
+#  Install: pip install -r requirements.txt
+# ============================================================
+
+# --- Core Detection & Pose Estimation ---
+ultralytics>=8.0.0
+
+# --- Computer Vision ---
+opencv-python>=4.7.0
+
+# --- Numerical ---
+numpy>=1.23.0
+
+# --- Configuration ---
+PyYAML>=6.0
+
+# --- GPT-4V Verification ---
+openai>=1.0.0
+
+# --- Environment Variable Management ---
+python-dotenv>=1.0.0
+
+# --- Backend API Communication ---
+requests>=2.28.0

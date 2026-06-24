@@ -1,0 +1,38 @@
+# ============================================================
+#  Smart Forensic Security System — Configuration
+# ============================================================
+#  All tunable parameters in one place.
+#  Secrets (API keys) should be in .env, NOT here.
+# ============================================================
+
+models:
+  person_detector: Trained_Models/yolov8_run/weights/best.onnx
+  pose_estimator: yolov8n-pose.onnx
+  weapon_detector: Trained_Models/Weapon/best.onnx
+
+thresholds:
+  person_confidence: 0.55
+  pose_confidence: 0.55
+  weapon_confidence: 0.25
+  contact_distance_px: 50
+
+performance:
+  frame_skip: 2
+  input_resolution: 640
+  weapon_resolution: 320
+
+temporal_smoothing:
+  window_size: 3
+  confirm_threshold: 2
+
+tracker:
+  type: bytetrack
+  persist: true
+
+contact_classification:
+  min_body_velocity: 5
+  min_hand_velocity: 8
+  assault_hand_velocity: 12
+  push_hand_velocity: 10
+  harassment_duration: 3
+  grabbing_duration: 5

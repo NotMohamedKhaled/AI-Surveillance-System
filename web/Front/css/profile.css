@@ -1,0 +1,24 @@
+.profile-page-wrap {
+  min-height: 100vh;
+  padding: 28px 12px;
+}
+
+.profile-container {
+  max-width: 980px;
+}
+
+.profile-title {
+  margin: 4px 0 0;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+.profile-card {
+  border-radius: 16px;
+}
+
+.profile-status-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}

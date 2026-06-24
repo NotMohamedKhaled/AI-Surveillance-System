@@ -1,0 +1,81 @@
+# ============================================================
+#  Graduation Project — Master .gitignore
+# ============================================================
+
+# ---------- Security ----------
+.env
+.env.*
+*.key
+credentials.json
+secrets.json
+
+# ---------- Python & AI (Final_11 folder) ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# AI Models (large binary files)
+*.pt
+*.onnx
+*.keras
+*.h5
+*.tflite
+*.pb
+Trained_Models/
+models/
+
+# Datasets (too large for VCS)
+Combined_VGG16_Dataset/
+Combined_YOLO_Dataset/
+dataset/
+data/
+*.csv
+
+# Logs & Output
+logs/
+*.log
+incidents/
+archive/
+
+# ---------- Node.js & Web (web folder) ----------
+node_modules/
+**/node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Build output
+web/Front/dist/
+web/Front/build/
+web/Back/dist/
+web/Back/build/
+.next/
+out/
+coverage/
+
+# Uploads
+**/uploads/*
+!**/uploads/.gitkeep
+
+# ---------- IDE & OS ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+*.docx
+*.mp4

@@ -1,0 +1,45 @@
+/* ============================================================
+   ALERTS (index.html #/alerts)
+   Page-specific styles only.
+   ============================================================ */
+
+/* Alert detail modal media (alerts page opens the same modal) */
+.detection-frame {
+  background: #000;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  position: relative;
+}
+.detection-frame-bg {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #0a0e1a, #111827);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.detection-frame-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(0deg, rgba(255,59,92,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,59,92,0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.detection-overlay {
+  position: absolute;
+  border: 2px solid var(--danger);
+  width: 35%; height: 50%;
+  top: 20%; left: 35%;
+  animation: scanBox 2s ease-in-out infinite;
+}
+.detection-overlay-label {
+  position: absolute;
+  top: -22px; left: 0;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.1em;
+}

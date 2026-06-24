@@ -1,0 +1,56 @@
+# ============================================================
+#  Smart Forensic Security System — .gitignore
+# ============================================================
+
+# ---------- Security ----------
+.env
+.env.*
+*.key
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ---------- Virtual Environments ----------
+venv/
+.venv/
+env/
+
+# ---------- AI Models (large binary files) ----------
+*.pt
+*.onnx
+*.keras
+*.h5
+*.tflite
+*.pb
+Trained_Models/
+
+# ---------- Datasets (too large for VCS) ----------
+Combined_VGG16_Dataset/
+Combined_YOLO_Dataset/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Logs & Output ----------
+logs/
+*.log
+incidents/
+
+# ---------- Archive ----------
+archive/
