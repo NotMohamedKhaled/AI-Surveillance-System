@@ -33,6 +33,7 @@ env/
 *.pb
 Trained_Models/
 models/
+Final_11/
 
 # Datasets (too large for VCS)
 Combined_VGG16_Dataset/
