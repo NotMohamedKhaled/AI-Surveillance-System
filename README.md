@@ -41,7 +41,7 @@ FORCE_RESET_SUPER_ADMIN_PASSWORD=false
 
 # --- AI Integration ---
 # The secret key the AI system must provide to send alerts to this backend
-# (Must match the AI_API_KEY in the AI folder's .env)
+# (Must match the AI_API_KEY in the Ai folder's .env)
 AI_API_KEY=supersecretkey123
 
 # --- Camera Monitoring ---
@@ -65,11 +65,28 @@ npm run dev
 ```
 *The backend will run on `http://localhost:3000`.*
 
-### 2. Configure the AI Environment (`.env`)
-In the `AI/` folder, create or edit the `.env` file. Here is an example of what it should look like:
+### 2. Set Up AI Models
+The AI models are too large to be uploaded directly to GitHub and are ignored by git. 
+
+First, download the custom-trained models from this **[Google Drive Link](YOUR_GOOGLE_DRIVE_LINK_HERE)**, then place them in their respective locations inside the `Ai/` folder:
+
+1. **Person Pose Model (`yolov8n-pose.onnx`)**
+   - Place it directly in the root of the `Ai/` folder:
+     `Ai/yolov8n-pose.onnx`
+
+2. **Person Detection Model (`best.onnx`)**
+   - Place this model at:
+     `Ai/Trained_Models/yolov8_run/weights/best.onnx` *(Create the folders if they do not exist)*
+
+3. **Weapon Detection Model (`best.onnx`)**
+   - Place this model at:
+     `Ai/Trained_Models/Weapon/best.onnx` *(Create the folders if they do not exist)*
+
+### 3. Configure the AI Environment (`.env`)
+In the `Ai/` folder, create or edit the `.env` file. Here is an example of what it should look like:
 
 ```env
-# Example .env file for AI/
+# Example .env file for Ai/
 
 # 1. OpenAI API Key (Optional but highly recommended)
 # Enables GPT-4o to act as a second-opinion filter, significantly reducing false positives.
@@ -86,12 +103,13 @@ AI_API_KEY=supersecretkey123
 CAMERA_AI_ID=C200
 ```
 
-### 3. Run the AI System
-Navigate to the AI folder and activate your virtual environment.
+### 4. Run the AI System
+Navigate to the `Ai` folder and activate your virtual environment.
 
 ```bash
-cd AI
+cd Ai
 # Activate your venv (e.g., .\venv\Scripts\activate on Windows)
+pip install -r requirements.txt
 ```
 
 The AI can be run in **two modes**:
